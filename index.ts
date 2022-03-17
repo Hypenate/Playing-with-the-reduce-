@@ -1,53 +1,112 @@
-interface salaryInfo {
-  id: number
+interface employee {
+  id: number;
   name: string;
   salary: number;
+  willGetRaise: boolean;
+  gender: 'm' | 'f' | 'x';
 }
 
-const salaries: salaryInfo[] = [
+const employees: employee[] = [
   {
     id: 1,
     name: 'Jane',
     salary: 300,
+    willGetRaise: false,
+    gender: 'f',
   },
   {
     id: 2,
     name: 'Joe',
     salary: 500,
+    willGetRaise: true,
+    gender: 'm',
   },
   {
     id: 3,
     name: 'Foo',
     salary: 150,
+    willGetRaise: true,
+    gender: 'x',
   },
   {
     id: 4,
     name: 'Bar',
-    salary: 200,
+    salary: 205,
+    willGetRaise: false,
+    gender: 'm',
   },
 ];
 
-const totalPayedSalaries = salaries.reduce((acc, salaryInfo) => acc + 1, 0);
-console.log(totalPayedSalaries);
+const employeeCount = employees.reduce((acc, employee) => acc + 1, 0);
+console.log('Number of employees', employeeCount);
 
-const totalPayedSalaryAmount = salaries.reduce(
-  (acc, salaryInfo) => acc + salaryInfo.salary,
+const totalPayedSalaryAmount = employees.reduce(
+  (acc, employee) => acc + employee.salary,
   0
 );
-console.log(totalPayedSalaryAmount);
+console.log('Total payed salaries', totalPayedSalaryAmount);
 
-const employees = salaries.reduce(
-  (acc, salaryInfo) => [...acc, salaryInfo.name],
+const employeeNames = employees.reduce(
+  (acc, employee) => [...acc, employee.name],
   []
 );
-console.log(employees);
+console.log('Names of employees', employeeNames);
 
-const dictionary = salaries.reduce(
-  (acc, salaryInfo) => ({ ...acc, [salaryInfo.id]: salaryInfo }),
+const dictionary = employees.reduce(
+  (acc, employee) => ({ ...acc, [employee.id]: employee }),
   {}
 );
-console.log(dictionary)
-console.log(dictionary[1])
+console.log('Dictionary', dictionary);
+console.log('Dictionary, find by ID', dictionary[1]);
 
-const maxPay = salaries.reduce((acc, salaryInfo) => Math.max(acc, salaryInfo.salary) , 0)
-console.log(maxPay);
+const highestSalary = employees.reduce(
+  (acc, employee) => Math.max(acc, employee.salary),
+  0
+);
+console.log('Highest salary', highestSalary);
+
+const overTwoHunderdSalaries = employees.reduce((acc, employee) => {
+  if (employee.salary > 205) {
+    return [...acc, employee.name];
+  }
+
+  return acc;
+}, []);
+console.log('Names who earn above 2O0', overTwoHunderdSalaries);
+
+const anyoneGettingRaise = employees.reduce((acc, employee) => {
+  // if true, always true
+  if (acc) return acc;
+
+  if (employee.willGetRaise) return true;
+}, false);
+console.log('Anyone getting a raise', anyoneGettingRaise);
+
+const whoIsGettingRaise = employees.reduce((acc, employee) => {
+  if (employee.willGetRaise) return [...acc, employee.name];
+
+  return acc;
+}, []);
+console.log('Who is getting a raise', whoIsGettingRaise);
+
+const differentGenderCounts = employees.reduce((acc, employee) => {
+  return { ...acc, [employee.gender]: (acc[employee.gender] || 0) + 1 };
+}, {});
+console.log('Different genders with count', differentGenderCounts);
+
+// Doesn't work :(
+// Same as above, but also adding the name(s) with the gender
+// ISSUE: With the 'm' it should list Joe and Bar, but it only shows 'Bar', I think it gets overwritten, because I do not destructor the key on line 104?
+const whoAreTheDifferentGenders = employees.reduce(
+  (acc, employee) => {
+    return {
+      ...acc,
+      [employee.gender]: {
+        count: ++acc.count,
+        employees: [...acc.employees, employee.name],
+      },
+    };
+  },
+  { count: 0, employees: [] }
+);
+console.log('Who are the different genders', whoAreTheDifferentGenders);
