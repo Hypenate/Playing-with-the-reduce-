@@ -90,23 +90,41 @@ const whoIsGettingRaise = employees.reduce((acc, employee) => {
 console.log('Who is getting a raise', whoIsGettingRaise);
 
 const differentGenderCounts = employees.reduce((acc, employee) => {
-  return { ...acc, [employee.gender]: (acc[employee.gender] || 0) + 1 };
+  return { ...acc, [employee.gender]: (acc[employee.gender] ?? 0) + 1 };
 }, {});
 console.log('Different genders with count', differentGenderCounts);
 
-// Doesn't work :(
-// Same as above, but also adding the name(s) with the gender
-// ISSUE: With the 'm' it should list Joe and Bar, but it only shows 'Bar', I think it gets overwritten, because I do not destructor the key on line 104?
-const whoAreTheDifferentGenders = employees.reduce(
-  (acc, employee) => {
-    return {
-      ...acc,
-      [employee.gender]: {
-        count: ++acc.count,
-        employees: [...acc.employees, employee.name],
-      },
+const whoAreTheDifferentGenders = employees.reduce((acc, employee) => {
+  if (acc[employee.gender]) {
+    // Exists
+    acc[employee.gender] = {
+      count: acc[employee.gender].count + 1,
+      employees: [...acc[employee.gender].employees, employee.name],
     };
-  },
-  { count: 0, employees: [] }
-);
+  } else {
+    // New
+    acc[employee.gender] = {
+      count: 1,
+      employees: [employee.name],
+    };
+  }
+
+  return acc;
+}, {});
 console.log('Who are the different genders', whoAreTheDifferentGenders);
+
+const whoAreTheDifferentGendersShort = employees.reduce((acc, employee) => {
+  return {
+    ...acc,
+    [employee.gender]: {
+      count: (acc[employee.gender]?.count ?? 0) + 1,
+      employees: acc[employee.gender]
+        ? [...acc[employee.gender]?.employees, employee.name]
+        : [employee.name],
+    },
+  };
+}, {});
+console.log(
+  'Who are the different genders (short)',
+  whoAreTheDifferentGendersShort
+);
